@@ -116,8 +116,13 @@ export class Game {
     const dt = Math.min(this.clock.getDelta(), 0.05);
     this.player.update(dt, this.world.obstacles);
     this.weapons.update(dt);
-    this.zombies.update(dt, () => {
-      this.end(false);
+    this.zombies.update(dt, (zombie) => {
+      // Cada zombi puede hacer 10 puntos de daño una vez por segundo.
+      if (zombie.attackCooldown > 0) return;
+      zombie.attackCooldown = 1;
+      const health = this.player.damage(10);
+      this.refreshUI();
+      if (health <= 0) this.end(false);
     }, this.world.obstacles);
     if (this.ended) return;
     this.pickups.update(dt, this.player, () => {
