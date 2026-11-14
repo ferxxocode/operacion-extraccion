@@ -132,7 +132,7 @@ export class Zombies {
     return true;
   }
 
-  update(dt, onAttack, obstacles = []) {
+  update(dt, onContact, obstacles = []) {
     const radius = CONFIG.zombie.radius;
     for (const zombie of this.items) {
       if (zombie.dead) continue;
@@ -150,8 +150,13 @@ export class Zombies {
         continue;
       }
 
+      if (dist <= CONFIG.zombie.attackRange) {
+        onContact();
+        break;
+      }
+
       zombie.walkTime += dt * 7;
-      const moving = dist > CONFIG.zombie.attackRange + 0.1;
+      const moving = dist > CONFIG.zombie.attackRange;
       this.playAction(zombie, moving ? (zombie.moveAction || zombie.idleAction) : (zombie.idleAction || zombie.moveAction));
       zombie.mixer?.update(dt);
 
@@ -171,12 +176,6 @@ export class Zombies {
         if (canX) pos.x = nextX;
         if (canZ) pos.z = nextZ;
         zombie.group.rotation.y = Math.atan2(dx, dz);
-      } else if (dist <= CONFIG.zombie.attackRange) {
-        zombie.attackCooldown -= dt;
-        if (zombie.attackCooldown <= 0) {
-          onAttack(10);
-          zombie.attackCooldown = 1.1;
-        }
       }
     }
   }
