@@ -17,15 +17,15 @@ export class Zombies {
         this.sharedModel = gltf.scene;
         this.animations = gltf.animations || [];
         this.items.forEach((zombie) => this.attachModel(zombie));
-        console.info("Modelo zombi cargado", this.animations.map(a => a.name));
+        console.info("Modelo zombi cargado", this.animations.map((a) => a.name));
       },
       undefined,
-      (error) => console.error("No se pudo cargar el modelo zombi", error)
+      (error) => console.error("No se pudo cargar el modelo zombi", error),
     );
 
     const positions = [
       [-8, 19], [9, 8], [-21, -17], [21, -31],
-      [-4, -32], [14, -5], [-20, 4], [4, 25]
+      [-4, -32], [14, -5], [-20, 4], [4, 25],
     ];
     positions.forEach(([x, z]) => this.spawn(x, z));
   }
@@ -67,14 +67,12 @@ export class Zombies {
       health: CONFIG.zombie.health,
       active: false,
       dead: false,
-      attackCooldown: 0,
       modelAdded: false,
       mixer: null,
       idleAction: null,
       moveAction: null,
       currentAction: null,
       walkTime: Math.random() * 10,
-      baseY: 0
     };
     this.items.push(zombie);
 
@@ -102,8 +100,10 @@ export class Zombies {
 
     if (this.animations.length) {
       zombie.mixer = new THREE.AnimationMixer(model);
-      const idleClip = this.animations.find(clip => /idle/i.test(clip.name));
-      const moveClip = this.animations.find(clip => /arm-swing|walk|run/i.test(clip.name));
+      const idleClip = this.animations.find((clip) => /idle/i.test(clip.name));
+      const moveClip = this.animations.find((clip) =>
+        /arm-swing|walk|run/i.test(clip.name),
+      );
       if (idleClip) zombie.idleAction = zombie.mixer.clipAction(idleClip);
       if (moveClip) zombie.moveAction = zombie.mixer.clipAction(moveClip);
       this.playAction(zombie, zombie.idleAction || zombie.moveAction);
@@ -123,8 +123,16 @@ export class Zombies {
 
   canOccupy(x, z, obstacles, radius) {
     for (const obstacle of obstacles) {
-      const closestX = THREE.MathUtils.clamp(x, obstacle.x - obstacle.halfW, obstacle.x + obstacle.halfW);
-      const closestZ = THREE.MathUtils.clamp(z, obstacle.z - obstacle.halfD, obstacle.z + obstacle.halfD);
+      const closestX = THREE.MathUtils.clamp(
+        x,
+        obstacle.x - obstacle.halfW,
+        obstacle.x + obstacle.halfW,
+      );
+      const closestZ = THREE.MathUtils.clamp(
+        z,
+        obstacle.z - obstacle.halfD,
+        obstacle.z + obstacle.halfD,
+      );
       const dx = x - closestX;
       const dz = z - closestZ;
       if (dx * dx + dz * dz < radius * radius) return false;
@@ -136,7 +144,6 @@ export class Zombies {
     const radius = CONFIG.zombie.radius;
     for (const zombie of this.items) {
       if (zombie.dead) continue;
-      zombie.attackCooldown = Math.max(0, zombie.attackCooldown - dt);
       const pos = zombie.group.position;
       const dx = this.player.position.x - pos.x;
       const dz = this.player.position.z - pos.z;
@@ -158,14 +165,23 @@ export class Zombies {
 
       zombie.walkTime += dt * 7;
       const moving = dist > CONFIG.zombie.attackRange;
-      this.playAction(zombie, moving ? (zombie.moveAction || zombie.idleAction) : (zombie.idleAction || zombie.moveAction));
+      this.playAction(
+        zombie,
+        moving
+          ? zombie.moveAction || zombie.idleAction
+          : zombie.idleAction || zombie.moveAction,
+      );
       zombie.mixer?.update(dt);
 
       // Pequeño balanceo corporal para dar sensación de avance incluso con animación limitada.
-      zombie.group.position.y = Math.abs(Math.sin(zombie.walkTime * 0.5)) * (moving ? 0.035 : 0.008);
+      zombie.group.position.y =
+        Math.abs(Math.sin(zombie.walkTime * 0.5)) * (moving ? 0.035 : 0.008);
 
       if (moving && dist > 0.0001) {
-        const step = Math.min(CONFIG.zombie.speed * dt, dist - CONFIG.zombie.attackRange);
+        const step = Math.min(
+          CONFIG.zombie.speed * dt,
+          dist - CONFIG.zombie.attackRange,
+        );
         const moveX = (dx / dist) * step;
         const moveZ = (dz / dist) * step;
         const nextX = pos.x + moveX;
