@@ -4,13 +4,16 @@ export class AmmoPickups {
   constructor(scene) {
     this.scene = scene;
     this.items = [];
+
+    // Los cuatro abastecimientos quedan en zonas transitables, fuera de edificios.
     [
       [-3, 12],
-      [12, -17],
-      [-19, -30],
+      [4, -20],
+      [-7, -32],
       [5, -2],
     ].forEach(([x, z]) => this.add(x, z));
   }
+
   add(x, z) {
     const group = new THREE.Group();
     group.position.set(x, 0.55, z);
@@ -33,6 +36,7 @@ export class AmmoPickups {
     this.scene.add(group);
     this.items.push({ group, collected: false, baseY: 0.55 });
   }
+
   update(dt, player, onCollect) {
     for (const item of this.items) {
       if (item.collected) continue;
