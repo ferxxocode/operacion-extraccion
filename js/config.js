@@ -24,7 +24,7 @@ export const CONFIG = {
     health: 2,
     speed: 1.9,
     detectRange: 28,
-    attackRange: 1.25,
+    attackRange: 0.9, // Contacto: radio del jugador + radio del zombi.
     radius: 0.48,
     // Modelo 3D CC0 alojado en 3DAssets.dev (Infected Runner, Jointed).
     model: "https://cdn.3dassets.dev/assets/32707/v1/model.glb"
