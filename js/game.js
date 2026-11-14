@@ -37,17 +37,12 @@ export class Game {
     this.running = false;
     this.ended = false;
     this.lastFrame = 0;
-    this.mouseDown = false;
     this.onMouseDown = (e) => {
       if (e.button === 0 && this.running && this.player.locked) {
-        this.mouseDown = true;
         this.fire();
       }
     };
-    this.onMouseUp = (e) => { if (e.button === 0) this.mouseDown = false; };
     document.addEventListener("mousedown", this.onMouseDown);
-    document.addEventListener("mouseup", this.onMouseUp);
-    window.addEventListener("blur", () => { this.mouseDown = false; });
     document.addEventListener("keydown", (e) => {
       if (e.code === "Digit1") this.weapons.select("pistol");
       if (e.code === "Digit2") this.weapons.select("rifle");
@@ -112,7 +107,6 @@ export class Game {
     if (this.ended) return;
     this.ended = true;
     this.running = false;
-    this.mouseDown = false;
     document.exitPointerLock?.();
     this.ui.end(won);
   }
@@ -121,13 +115,11 @@ export class Game {
     requestAnimationFrame(this.animate);
     const dt = Math.min(this.clock.getDelta(), 0.05);
     this.player.update(dt, this.world.obstacles);
-    if (this.mouseDown && this.weapons.current === "rifle") this.fire();
     this.weapons.update(dt);
-    this.zombies.update(dt, (damage) => {
-      this.player.damage(damage);
-      this.refreshUI();
-      if (this.player.health <= 0) this.end(false);
+    this.zombies.update(dt, () => {
+      this.end(false);
     }, this.world.obstacles);
+    if (this.ended) return;
     this.pickups.update(dt, this.player, () => {
       this.weapons.refill();
       this.ui.notify("Munición recuperada");
