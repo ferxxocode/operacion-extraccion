@@ -136,6 +136,7 @@ export class Zombies {
     const radius = CONFIG.zombie.radius;
     for (const zombie of this.items) {
       if (zombie.dead) continue;
+      zombie.attackCooldown = Math.max(0, zombie.attackCooldown - dt);
       const pos = zombie.group.position;
       const dx = this.player.position.x - pos.x;
       const dz = this.player.position.z - pos.z;
@@ -151,7 +152,7 @@ export class Zombies {
       }
 
       if (dist <= CONFIG.zombie.attackRange) {
-        onContact();
+        onContact(zombie);
         break;
       }
 
