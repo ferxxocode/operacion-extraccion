@@ -36,31 +36,43 @@ export class Game {
     this.kills = 0;
     this.running = false;
     this.ended = false;
-    this.lastFrame = 0;
+
     this.onMouseDown = (e) => {
       if (e.button === 0 && this.running && this.player.locked) {
         this.fire();
       }
     };
     document.addEventListener("mousedown", this.onMouseDown);
+
+    // Si el jugador libera el cursor con ESC, un clic sobre el canvas
+    // vuelve a capturarlo para continuar jugando.
+    this.renderer.domElement.addEventListener("click", () => {
+      if (this.running && !this.ended && !this.player.locked) {
+        this.player.lock();
+      }
+    });
+
     document.addEventListener("keydown", (e) => {
       if (e.code === "Digit1") this.weapons.select("pistol");
       if (e.code === "Digit2") this.weapons.select("rifle");
-      if (e.code === "Escape" && this.running)
+      if (e.code === "Escape" && this.running) {
         this.ui.notify("Cursor liberado. Haz clic en el juego para continuar.");
+      }
       this.refreshUI();
     });
     addEventListener("resize", () => this.resize());
     this.refreshUI();
   }
+
   start() {
+    if (this.running || this.ended) return;
     this.running = true;
-    this.ended = false;
     this.ui.showHUD();
     this.player.lock();
     this.clock.start();
     this.animate();
   }
+
   fire() {
     const now = performance.now();
     const fired = this.weapons.shoot(now);
@@ -93,16 +105,17 @@ export class Game {
     }
     this.refreshUI();
   }
+
   refreshUI() {
     const w = this.weapons.currentData;
     this.ui.update({
-      health: this.player.health,
       kills: this.kills,
       weapon: w.name,
       ammo: w.magazine,
       reserve: w.reserve,
     });
   }
+
   end(won) {
     if (this.ended) return;
     this.ended = true;
@@ -110,35 +123,41 @@ export class Game {
     document.exitPointerLock?.();
     this.ui.end(won);
   }
+
   animate = () => {
     if (!this.running) return;
     requestAnimationFrame(this.animate);
     const dt = Math.min(this.clock.getDelta(), 0.05);
     this.player.update(dt, this.world.obstacles);
     this.weapons.update(dt);
-    this.zombies.update(dt, (zombie) => {
-      // Cada zombi puede hacer 10 puntos de daño una vez por segundo.
-      if (zombie.attackCooldown > 0) return;
-      zombie.attackCooldown = 1;
-      const health = this.player.damage(10);
-      this.refreshUI();
-      if (health <= 0) this.end(false);
-    }, this.world.obstacles);
+
+    // La rúbrica establece que el contacto con un zombi provoca Game Over.
+    this.zombies.update(
+      dt,
+      () => this.end(false),
+      this.world.obstacles,
+    );
     if (this.ended) return;
+
     this.pickups.update(dt, this.player, () => {
       this.weapons.refill();
       this.ui.notify("Munición recuperada");
       this.refreshUI();
     });
+
     const ex = this.world.extraction.position;
     if (
       Math.hypot(this.player.position.x - ex.x, this.player.position.z - ex.z) <
       CONFIG.world.extraction.radius
-    )
+    ) {
       this.end(true);
+      return;
+    }
+
     this.refreshUI();
     this.renderer.render(this.scene, this.camera);
   };
+
   resize() {
     this.camera.aspect = innerWidth / innerHeight;
     this.camera.updateProjectionMatrix();
