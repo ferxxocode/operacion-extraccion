@@ -24,7 +24,7 @@ El jugador debe sobrevivir en un escenario abandonado, eliminar zombis, recoger 
 ### Opción A: Visual Studio Code + Live Server
 
 1. Clona o descarga este repositorio.
-2. Abre la carpeta operacion-extraccion en Visual Studio Code.
+2. Abre la carpeta del proyecto en Visual Studio Code.
 3. Instala la extensión **Live Server**, si todavía no la tienes.
 4. Haz clic derecho en index.html y selecciona **Open with Live Server**.
 5. El juego se abrirá en el navegador.
@@ -45,26 +45,28 @@ Abre en el navegador la dirección local que indique la terminal.
 |---|---|
 | Moverse | W, A, S, D |
 | Mirar | Movimiento del mouse |
-| Disparar | Clic izquierdo |
+| Disparar | Un disparo por cada clic izquierdo |
 | Cambiar a pistola | Tecla 1 |
 | Cambiar a fusil | Tecla 2 |
 | Liberar el cursor | ESC |
+| Recuperar el control del mouse | Clic sobre el área del juego |
 
-**Disparo:** la pistola dispara una vez por clic. El fusil dispara de forma automática mientras mantienes presionado el clic izquierdo, respetando su intervalo entre disparos.
+**Disparos:** cada clic izquierdo genera un único disparo con el arma seleccionada. Mantener presionado el botón no activa el disparo automático.
 
-No hay recarga manual mediante una tecla: las cajas de abastecimiento recuperan munición automáticamente cuando el jugador se acerca.
+No hay recarga manual mediante una tecla ni recuperación ilimitada: las cajas de abastecimiento distribuidas por el escenario recuperan munición cuando el jugador se acerca.
 
 ## Objetivo y mecánicas
 
 - Explorar un escenario 3D de ambiente postapocalíptico.
 - Utilizar dos armas con parámetros y munición independientes.
 - Detectar impactos mediante **Raycasting** desde el centro de la cámara.
-- Enfrentarse a zombis que se activan cuando el jugador entra en su radio de detección y luego lo persiguen.
-- Eliminar cada zombi con dos impactos válidos.
-- Evitar el contacto con los enemigos, que reduce la vida del jugador.
+- Enfrentarse a zombis que permanecen inactivos hasta que el jugador entra en su radio de detección.
+- Los zombis activos persiguen al jugador.
+- Eliminar cada zombi con exactamente dos impactos válidos.
+- Evitar el contacto con los enemigos: cuando un zombi alcanza al jugador, aparece **GAME OVER** y la partida se detiene.
 - Recoger cajas de munición distribuidas por el escenario.
-- Llegar a la zona verde para completar la extracción.
-- Perder la partida si la vida del jugador llega a cero.
+- Llegar a la zona verde para completar la extracción y mostrar el mensaje de victoria.
+- Reiniciar la partida desde la pantalla final.
 
 ## Estructura del proyecto
 
@@ -78,10 +80,10 @@ operacion-extraccion/
 │   ├── main.js         # Punto de entrada y botones
 │   ├── game.js         # Coordinación y ciclo principal del juego
 │   ├── config.js       # Parámetros del jugador, armas, zombis y mundo
-│   ├── player.js       # Cámara FPS, controles, movimiento y vida
+│   ├── player.js       # Cámara FPS, controles y movimiento
 │   ├── world.js        # Escenario, iluminación, obstáculos y extracción
 │   ├── weapons.js      # Modelos, selección, disparos y munición
-│   ├── zombies.js      # Enemigos, detección, persecución y daño
+│   ├── zombies.js      # Enemigos, detección, persecución y daño por impactos
 │   ├── ammo.js         # Cajas coleccionables de munición
 │   └── ui.js           # HUD, notificaciones y pantallas finales
 └── assets/
