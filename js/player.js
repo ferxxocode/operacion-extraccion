@@ -59,8 +59,10 @@ export class Player {
     if (!blocked) this.position.copy(next);
     this.camera.position.copy(this.position);
   }
-  damage(amount) {
-    this.health = Math.max(0, this.health - amount);
+  damage(amount = 10) {
+    // Evita que una llamada sin cantidad convierta la vida en NaN.
+    const safeAmount = Number.isFinite(amount) && amount > 0 ? amount : 10;
+    this.health = Math.max(0, this.health - safeAmount);
     return this.health;
   }
 }
