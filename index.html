@@ -27,6 +27,7 @@
           <p><b>MOUSE</b> — Mirar · <b>CLIC IZQ.</b> — Disparar</p>
           <p><b>1 / 2</b> — Cambiar arma · <b>ESC</b> — Liberar cursor</p>
           <p>Busca cajas de munición y llega al punto verde de extracción.</p>
+          <p>Evita todo contacto con los zombis: serás atrapado.</p>
         </div>
         <button id="startButton">INICIAR MISIÓN</button>
         <p class="small">
@@ -47,27 +48,23 @@
     <div id="hud">
       <div class="hud-top">
         <div class="hud-box">
-          <span class="hud-label">ESTADO</span><strong id="health">100</strong
-          ><span>HP</span>
+          <span class="hud-label">OBJETIVO</span>
+          <strong id="objective">LLEGA A EXTRACCIÓN</strong>
         </div>
         <div class="hud-box">
-          <span class="hud-label">OBJETIVO</span
-          ><strong id="objective">LLEGA A EXTRACCIÓN</strong>
-        </div>
-        <div class="hud-box">
-          <span class="hud-label">ZOMBIS ELIMINADOS</span
-          ><strong id="kills">0</strong>
+          <span class="hud-label">ZOMBIS ELIMINADOS</span>
+          <strong id="kills">0</strong>
         </div>
       </div>
       <div class="crosshair"><span></span><i></i></div>
       <div class="hud-bottom">
         <div class="weapon-info">
-          <span class="hud-label">ARMA ACTUAL</span
-          ><strong id="weaponName">PISTOLA</strong>
+          <span class="hud-label">ARMA ACTUAL</span>
+          <strong id="weaponName">PISTOLA</strong>
         </div>
         <div class="ammo-info">
-          <strong id="ammo">12 / 12</strong
-          ><span class="hud-label">MUNICIÓN</span>
+          <strong id="ammo">12 / 12</strong>
+          <span class="hud-label">MUNICIÓN</span>
         </div>
       </div>
       <div id="notice" class="notice"></div>
